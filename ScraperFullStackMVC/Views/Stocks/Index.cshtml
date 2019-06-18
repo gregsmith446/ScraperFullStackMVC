@@ -1,0 +1,78 @@
+﻿@model IEnumerable<ScraperFullStackMVC.Models.Stock>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Portfolio Page</h2>
+
+<p>This page houses your stock portfolio.</p>
+<p>Clicking the button below will run the scraper and update the portfolio. (Scraping may take a few moments)</p>
+@Html.ActionLink("Run Scraper", "Scrape", "Stocks", new { @class = "btn btn-primary", id = "scrapebtn" })
+
+
+@if (Model.Count() > 0)
+{
+    <p>Last scrape was: @Model.ToArray()[0].scrapetime</p>
+
+    <br />
+    
+    <table class="table">
+        <tr>
+            <th>Stock Symbol</th>
+            <th>Last Available Price</th>
+            <th>Change</th>
+            <th>% Change</th>
+            <th>Currency</th>
+            <th>Volume</th>
+            <th>Market Cap</th>
+            <th>Time of Scrape</th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.symbol)
+            </td>
+            <td>
+                $@Html.DisplayFor(modelItem => item.price)
+            </td>
+            <td>
+                $@Html.DisplayFor(modelItem => item.change)
+            </td>
+            <td>
+                %@Html.DisplayFor(modelItem => item.pchange)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.currency)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.volume)
+            </td>
+            <td>
+                $@Html.DisplayFor(modelItem => item.marketcap)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.scrapetime)
+            </td>
+            <td>
+                <form action="https://finance.yahoo.com/quote/@item.symbol" method="get">
+                    <button class="btn btn-dark">Details</button>
+                </form>
+            </td>
+        </tr>
+        }
+
+    </table>
+
+}
+else if (Model.Count() <= 0)
+{
+    <p>You have not run the scraper yet. Click the button below to retrieve your portfolio.</p>
+}
+
+    <script language="javascript" type="text/javascript">
+    document.getElementById("scrapebtn").addEventListener("mouseup", () => document.getElementById("myLoader").style.visibility = "visible");
+    </script>  

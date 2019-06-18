@@ -16,24 +16,13 @@ namespace ScraperFullStackMVC
         public Scraper()
         { }
 
-        // blueprint for stock model/object
-        public class Stock
-        {
-            public string Symbol { get; set; }
-            public string Price { get; set; }
-            public string Change { get; set; }
-            public string PChange { get; set; }
-            public string Volume { get; set; }
-            public string MarketCap { get; set; }
-            public string ScrapeTime { get; set; }
-        }
-
-        public List<Stock> Scrape()
+        public List<StockModel> Scrape()
         {
             ChromeOptions options = new ChromeOptions();
 
             // Add capbilities to ChromeOptions
             options.AddArguments("test -Type", "--ignore-certificate-errors", "--disable-gpu", "disable-popups");
+            // "--headless"
 
             // Launching browser with desired capabilities + proper binary file location
             IWebDriver driver = new ChromeDriver(@"\Users\gregs\Desktop\CD\CapstoneConsoleApp\CapstoneConsoleApp\bin", options);
@@ -65,35 +54,29 @@ namespace ScraperFullStackMVC
             ReadOnlyCollection<IWebElement> items = list.FindElements(By.TagName("tr"));
             int count = items.Count;
 
-            List<Stock> stockList = new List<Stock>();
+            List<StockModel> stockList = new List<StockModel>();
 
             for (int i = 1; i <= count; i++)
             {
                 string symbol = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[1]/a")).GetAttribute("innerText");
-                Console.WriteLine(symbol);
                 string price = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[2]/span")).GetAttribute("innerText");
-                Console.WriteLine(price);
                 string change = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[3]/span")).GetAttribute("innerText");
-                Console.WriteLine(change);
                 string pchange = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[4]/span")).GetAttribute("innerText");
-                Console.WriteLine(pchange);
+                string currency = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[5]")).GetAttribute("innerText");
                 string volume = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[7]/span")).GetAttribute("innerText");
-                Console.WriteLine(volume);
                 string marketcap = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[13]/span")).GetAttribute("innerText");
-                Console.WriteLine(marketcap);
-                string scrapeTime = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[6]/span")).GetAttribute("innerText");
-                Console.WriteLine(scrapeTime);
-
 
                 // for each stock entry, a new stock object is created
-                Stock newStock = new Stock();
-                newStock.Symbol = symbol;
-                newStock.Price = price;
-                newStock.Change = change;
-                newStock.PChange = pchange;
-                newStock.ScrapeTime = scrapeTime;
-                newStock.Volume = volume;
-                newStock.MarketCap = marketcap;
+                StockModel newStock = new StockModel
+                {
+                    Symbol = symbol,
+                    Price = price,
+                    Change = change,
+                    PChange = pchange,
+                    Currency = currency,
+                    Volume = volume,
+                    MarketCap = marketcap
+                };
 
                 // that stock is then added to the list of stocks
                 stockList.Add(newStock);

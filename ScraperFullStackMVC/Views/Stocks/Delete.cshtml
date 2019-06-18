@@ -1,0 +1,89 @@
+﻿@model ScraperFullStackMVC.Models.Stocks
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Stocks</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.symbol)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.symbol)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.price)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.change)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.change)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.pchange)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.pchange)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.currency)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.currency)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.volume)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.volume)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.marketcap)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.marketcap)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.scrapetime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.scrapetime)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

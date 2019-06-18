@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="StockDatabaseModelStoreContainer" CdmEntityContainer="StockDatabaseEntities">
+    <EntitySetMapping Name="Stocks">
+      <EntityTypeMapping TypeName="StockDatabaseModel.Stocks">
+        <MappingFragment StoreEntitySet="Stocks">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="symbol" ColumnName="symbol" />
+          <ScalarProperty Name="price" ColumnName="price" />
+          <ScalarProperty Name="change" ColumnName="change" />
+          <ScalarProperty Name="pchange" ColumnName="pchange" />
+          <ScalarProperty Name="currency" ColumnName="currency" />
+          <ScalarProperty Name="volume" ColumnName="volume" />
+          <ScalarProperty Name="marketcap" ColumnName="marketcap" />
+          <ScalarProperty Name="scrapetime" ColumnName="scrapetime" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>
