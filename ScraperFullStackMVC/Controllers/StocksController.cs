@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -20,6 +21,46 @@ namespace ScraperFullStackMVC.Controllers
             return View(db.Stocks.ToList());
         }
 
+        public ActionResult ScrapeYahoo()
+        {
+            if (ModelState.IsValid)
+            {
+                Scraper buttonScraper = new Scraper();
+                DateTime myDateTime = DateTime.Now;
+
+                var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=StockDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+
+                using (SqlConnection sqlConnect = new SqlConnection(connection))
+                {
+                    sqlConnect.Open();
+
+                    var snapShot = buttonScraper.Scrape();
+
+                    foreach (var item in snapShot)
+                    {
+
+                        SqlCommand insCommand = new SqlCommand("INSERT INTO [Stocks] (symbol, price, change, pchange, currency, volume, marketcap, scrapetime) VALUES (@symbol, @price, @change, @pchange, @currency, @volume, @marketcap, @scrapetime)", sqlConnect);
+                        insCommand.Parameters.AddWithValue("@symbol", item.Symbol.ToString());
+                        insCommand.Parameters.AddWithValue("@price", item.Price.ToString());
+                        insCommand.Parameters.AddWithValue("@change", item.Change.ToString());
+                        insCommand.Parameters.AddWithValue("@pchange", item.PChange.ToString());
+                        insCommand.Parameters.AddWithValue("@currency", item.Currency.ToString());
+                        insCommand.Parameters.AddWithValue("@volume", item.Volume.ToString());
+                        insCommand.Parameters.AddWithValue("@marketcap", item.MarketCap.ToString());
+                        insCommand.Parameters.AddWithValue("@scrapetime", myDateTime);
+
+                        insCommand.ExecuteNonQuery();
+                    }
+                    Console.WriteLine("DB updated");
+                    sqlConnect.Close();
+
+                    db.SaveChanges();
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
+
         // GET: Stocks/Details/5
         public ActionResult Details(int? id)
         {
@@ -33,95 +74,6 @@ namespace ScraperFullStackMVC.Controllers
                 return HttpNotFound();
             }
             return View(stocks);
-        }
-
-        // GET: Stocks/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Stocks/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,symbol,price,change,pchange,currency,volume,marketcap,scrapetime")] Stocks stocks)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Stocks.Add(stocks);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            return View(stocks);
-        }
-
-        // GET: Stocks/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Stocks stocks = db.Stocks.Find(id);
-            if (stocks == null)
-            {
-                return HttpNotFound();
-            }
-            return View(stocks);
-        }
-
-        // POST: Stocks/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,symbol,price,change,pchange,currency,volume,marketcap,scrapetime")] Stocks stocks)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(stocks).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(stocks);
-        }
-
-        // GET: Stocks/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Stocks stocks = db.Stocks.Find(id);
-            if (stocks == null)
-            {
-                return HttpNotFound();
-            }
-            return View(stocks);
-        }
-
-        // POST: Stocks/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Stocks stocks = db.Stocks.Find(id);
-            db.Stocks.Remove(stocks);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }
