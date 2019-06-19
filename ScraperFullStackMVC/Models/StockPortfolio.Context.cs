@@ -25,6 +25,6 @@ namespace ScraperFullStackMVC.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Stock> Stock { get; set; }
+        public virtual DbSet<Stocks> Stocks { get; set; }
     }
 }

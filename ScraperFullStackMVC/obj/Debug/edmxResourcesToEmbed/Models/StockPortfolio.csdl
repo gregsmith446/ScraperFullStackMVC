@@ -15,6 +15,6 @@
     <Property Name="scrapetime" Type="DateTime" Nullable="false" Precision="3" />
   </EntityType>
   <EntityContainer Name="StockDatabaseEntities" annotation:LazyLoadingEnabled="true">
-    <EntitySet Name="Stocks" EntityType="Self.Stocks" />
+    <EntitySet Name="Stocks" EntityType="StockDatabaseModel.Stocks" />
   </EntityContainer>
 </Schema>
