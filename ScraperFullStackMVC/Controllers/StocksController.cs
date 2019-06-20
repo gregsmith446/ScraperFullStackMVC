@@ -21,6 +21,7 @@ namespace ScraperFullStackMVC.Controllers
             return View(db.Stocks.ToList());
         }
 
+        // SCRAPER CODE + SQL QUERIES
         public ActionResult ScrapeYahoo()
         {
             if (ModelState.IsValid)
@@ -30,16 +31,16 @@ namespace ScraperFullStackMVC.Controllers
 
                 var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=StockDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
-                using (SqlConnection sqlConnect = new SqlConnection(connection))
+                using (SqlConnection sqlConnection = new SqlConnection(connection))
                 {
-                    sqlConnect.Open();
+                    sqlConnection.Open();
 
                     var snapShot = buttonScraper.Scrape();
 
                     foreach (var item in snapShot)
                     {
 
-                        SqlCommand insCommand = new SqlCommand("INSERT INTO [Stocks] (symbol, price, change, pchange, currency, volume, marketcap, scrapetime) VALUES (@symbol, @price, @change, @pchange, @currency, @volume, @marketcap, @scrapetime)", sqlConnect);
+                        SqlCommand insCommand = new SqlCommand("INSERT INTO [Stocks] (symbol, price, change, pchange, currency, volume, marketcap, scrapetime) VALUES (@symbol, @price, @change, @pchange, @currency, @volume, @marketcap, @scrapetime)", sqlConnection);
                         insCommand.Parameters.AddWithValue("@symbol", item.Symbol.ToString());
                         insCommand.Parameters.AddWithValue("@price", item.Price.ToString());
                         insCommand.Parameters.AddWithValue("@change", item.Change.ToString());
@@ -52,7 +53,7 @@ namespace ScraperFullStackMVC.Controllers
                         insCommand.ExecuteNonQuery();
                     }
                     Console.WriteLine("DB updated");
-                    sqlConnect.Close();
+                    sqlConnection.Close();
 
                     db.SaveChanges();
                 }
@@ -61,8 +62,23 @@ namespace ScraperFullStackMVC.Controllers
         }
 
 
-        // GET: Stocks/Details/5
+        // GET: Stocks/Details/Id
         public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Stocks stocks = db.Stocks.Find(id);
+            if (stocks == null)
+            {
+                return HttpNotFound();
+            }
+            return View(stocks);
+        }
+
+        // GET: Stocks1/Delete/5
+        public ActionResult Delete(int? id)
         {
             if (id == null)
             {

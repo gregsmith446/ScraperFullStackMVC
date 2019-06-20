@@ -28,10 +28,10 @@ namespace ScraperFullStackMVC
             IWebDriver driver = new ChromeDriver(@"\Users\gregs\Desktop\CD\CapstoneConsoleApp\CapstoneConsoleApp\bin", options);
             driver.Manage().Window.Maximize();
 
-            // create default wait 100 seconds + set to ignore the most persistent and disruptive timeout errors that break scraper
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(100000));
-            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(WebDriverTimeoutException), typeof(UnhandledAlertException));
-
+            // create default wait 10 seconds + set to ignore the most persistent and disruptive timeout errors that break scraper
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(WebDriverTimeoutException), typeof(UnhandledAlertException), typeof(TimeoutException), typeof(WebDriverException));
+            
             driver.Navigate().GoToUrl("https://login.yahoo.com/config/login?.src=finance&amp;.intl=us&amp;.done=https%3A%2F%2Ffinance.yahoo.com%2Fportfolios");
 
             wait.Until(waiter => waiter.FindElement(By.Id("login-username")));
@@ -46,10 +46,13 @@ namespace ScraperFullStackMVC
             IWebElement loginButton = driver.FindElement(By.Id("login-signin"));
             loginButton.SendKeys(Keys.Return);
 
-            driver.Navigate().GoToUrl("https://finance.yahoo.com/portfolio/p_0/view/v1");
             //EXPLICIT WAIT
-            wait.Until(waiter => waiter.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[1]/td[13]/span")));
+            wait.Until(waiter => waiter.FindElement(By.XPath("//*[@id=\"uh-logo\"]")));
 
+            driver.Navigate().GoToUrl("https://finance.yahoo.com/portfolio/p_0/view/v1");
+            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(WebDriverTimeoutException), typeof(UnhandledAlertException), typeof(TimeoutException), typeof(WebDriverException));
+
+            wait.Until(waiter => waiter.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[7]/td[1]/a")));
             IWebElement list = driver.FindElement(By.TagName("tbody"));
             ReadOnlyCollection<IWebElement> items = list.FindElements(By.TagName("tr"));
             int count = items.Count;

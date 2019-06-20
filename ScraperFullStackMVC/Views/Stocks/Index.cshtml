@@ -11,12 +11,6 @@
 @Html.ActionLink("Scrape New Stock Data", "ScrapeYahoo", "Stocks")
 
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-
-
-
 <table class="table">
     <tr>
         <th>
@@ -74,7 +68,6 @@
                 @Html.DisplayFor(modelItem => item.scrapetime)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
                 @Html.ActionLink("Details", "Details", new { id = item.Id }) |
                 @Html.ActionLink("Delete", "Delete", new { id = item.Id })
             </td>
@@ -82,7 +75,3 @@
     }
 
 </table>
-
-<script language="javascript" type="text/javascript">
-    document.getElementById("scrapebtn").addEventListener("mouseup", () => document.getElementById("myLoader").style.visibility = "visible");
-</script>
