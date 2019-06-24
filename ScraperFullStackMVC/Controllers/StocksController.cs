@@ -16,9 +16,16 @@ namespace ScraperFullStackMVC.Controllers
         private StockDatabaseEntities db = new StockDatabaseEntities();
 
         // GET: Stocks
-        public ActionResult Index()
+        public ActionResult Index(string search)
         {
-            return View(db.Stocks.ToList());
+            if (search != null)
+            {
+                return View(db.Stocks.Where(x => x.symbol.StartsWith(search) || search == null).ToList());
+            }
+            else 
+            {
+                return View(db.Stocks.ToList());
+            }
         }
 
         // SCRAPER CODE + SQL QUERIES
@@ -61,24 +68,8 @@ namespace ScraperFullStackMVC.Controllers
             return RedirectToAction("Index");
         }
 
-
         // GET: Stocks/Details/Id
         public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Stocks stocks = db.Stocks.Find(id);
-            if (stocks == null)
-            {
-                return HttpNotFound();
-            }
-            return View(stocks);
-        }
-
-        // GET: Stocks1/Delete/5
-        public ActionResult Delete(int? id)
         {
             if (id == null)
             {
