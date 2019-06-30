@@ -21,7 +21,7 @@ namespace ScraperFullStackMVC
             ChromeOptions options = new ChromeOptions();
 
             // Add capbilities to ChromeOptions
-            options.AddArguments("test -Type", "--ignore-certificate-errors", "--disable-gpu", "disable-popups", "--headless");
+            options.AddArguments("test -Type", "--ignore-certificate-errors", "--disable-gpu", "disable-popups");
             // "--headless"
 
             // Launching browser with desired capabilities + proper binary file location
