@@ -59,7 +59,6 @@ namespace ScraperFullStackMVC.Controllers
 
                         insCommand.ExecuteNonQuery();
                     }
-                    Console.WriteLine("DB updated");
                     sqlConnection.Close();
 
                     db.SaveChanges();
