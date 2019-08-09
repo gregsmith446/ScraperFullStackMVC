@@ -33,7 +33,6 @@ namespace ScraperFullStackMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                Scraper buttonScraper = new Scraper();
                 DateTime myDateTime = DateTime.Now;
 
                 var connection = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=StockDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
@@ -42,11 +41,14 @@ namespace ScraperFullStackMVC.Controllers
                 {
                     sqlConnection.Open();
 
-                    var snapShot = buttonScraper.Scrape();
+                    var buttonScraper = new Scrape("gregsmith446@intracitygeeks.org", "SILICONrhode1!");
 
-                    foreach (var item in snapShot)
+                    buttonScraper.LogIn();
+                    buttonScraper.NavigateToPortfolio();
+                    var snapshot = buttonScraper.ScrapeStockData();
+
+                    foreach (var item in snapshot)
                     {
-
                         SqlCommand insCommand = new SqlCommand("INSERT INTO [Stocks] (symbol, price, change, pchange, currency, volume, marketcap, scrapetime) VALUES (@symbol, @price, @change, @pchange, @currency, @volume, @marketcap, @scrapetime)", sqlConnection);
                         insCommand.Parameters.AddWithValue("@symbol", item.Symbol.ToString());
                         insCommand.Parameters.AddWithValue("@price", item.Price.ToString());

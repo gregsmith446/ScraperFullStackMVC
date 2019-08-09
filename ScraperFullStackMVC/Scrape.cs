@@ -5,59 +5,49 @@ using ScraperFullStackMVC.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Web;
 
 namespace ScraperFullStackMVC
 {
-    public class Scraper
+    public class Scrape
     {
-        // build instance of scraper using below blueprints
-        public Scraper()
-        { }
+        private readonly string UserId;
+        private readonly string Password;
+        ChromeDriver driver = new ChromeDriver(@"C:\Users\gregs\Desktop\CD\ScraperFullStackMVC\ScraperFullStackMVC\bin");
 
-        public List<StockModel> Scrape()
+        public Scrape(string id, string password)
         {
-            ChromeOptions options = new ChromeOptions();
+            UserId = id;
+            Password = password;
+        }
 
-            // Add capbilities to ChromeOptions
-            options.AddArguments("test -Type", "--ignore-certificate-errors", "--disable-gpu", "disable-popups");
-            // "--headless"
-
-            // Launching browser with desired capabilities + proper binary file location
-            IWebDriver driver = new ChromeDriver(@"\Users\gregs\Desktop\CD\CapstoneConsoleApp\CapstoneConsoleApp\bin", options);
-            driver.Manage().Window.Maximize();
-
-            // create default wait 10 seconds + set to ignore the most persistent and disruptive timeout errors that break scraper
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(WebDriverTimeoutException), typeof(UnhandledAlertException), typeof(TimeoutException), typeof(WebDriverException));
-            
+        public void LogIn()
+        {
             driver.Navigate().GoToUrl("https://login.yahoo.com/config/login?.src=finance&amp;.intl=us&amp;.done=https%3A%2F%2Ffinance.yahoo.com%2Fportfolios");
+            driver.FindElement(By.Id("login-username")).SendKeys(UserId + Keys.Enter);
 
-            wait.Until(waiter => waiter.FindElement(By.Id("login-username")));
-            IWebElement username = driver.FindElement(By.Id("login-username"));
-            username.SendKeys("gregsmith446@intracitygeeks.org");
-            username.SendKeys(Keys.Return);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            driver.FindElement(By.Id("login-passwd")).SendKeys(Password + Keys.Enter);
+        }
 
-            // EXPLICIT WAIT
-            wait.Until(waiter => waiter.FindElement(By.Id("login-passwd")));
-            IWebElement password = driver.FindElement(By.Id("login-passwd"));
-            password.SendKeys("SILICONrhode1!");
-            IWebElement loginButton = driver.FindElement(By.Id("login-signin"));
-            loginButton.SendKeys(Keys.Return);
-
-            //EXPLICIT WAIT
-            wait.Until(waiter => waiter.FindElement(By.XPath("//*[@id=\"uh-logo\"]")));
-
+        public void NavigateToPortfolio()
+        {
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(100);
             driver.Navigate().GoToUrl("https://finance.yahoo.com/portfolio/p_0/view/v1");
-            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(WebDriverTimeoutException), typeof(UnhandledAlertException), typeof(TimeoutException), typeof(WebDriverException));
+        }
 
-            wait.Until(waiter => waiter.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[7]/td[1]/a")));
+        public List<StockModel> ScrapeStockData()
+        {
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(100);
+
+            List<StockModel> stockList = new List<StockModel>();
+
             IWebElement list = driver.FindElement(By.TagName("tbody"));
             ReadOnlyCollection<IWebElement> items = list.FindElements(By.TagName("tr"));
             int count = items.Count;
 
-            List<StockModel> stockList = new List<StockModel>();
+            Console.WriteLine("There are " + count + " stocks in the list.");
+
+            IList<IWebElement> stockData = driver.FindElements(By.ClassName("simpTblRow"));
 
             for (int i = 1; i <= count; i++)
             {
@@ -69,8 +59,7 @@ namespace ScraperFullStackMVC
                 string volume = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[7]/span")).GetAttribute("innerText");
                 string marketcap = driver.FindElement(By.XPath("//*[@id=\"pf-detail-table\"]/div[1]/table/tbody/tr[" + i + "]/td[13]/span")).GetAttribute("innerText");
 
-                // for each stock entry, a new stock object is created
-                StockModel newStock = new StockModel
+                StockModel eachStock = new StockModel
                 {
                     Symbol = symbol,
                     Price = price,
@@ -80,13 +69,9 @@ namespace ScraperFullStackMVC
                     Volume = volume,
                     MarketCap = marketcap
                 };
-
-                // that stock is then added to the list of stocks
-                stockList.Add(newStock);
+                stockList.Add(eachStock);
             }
-
-            driver.Quit();
-
+            driver.Close();
             return stockList;
         }
     }
